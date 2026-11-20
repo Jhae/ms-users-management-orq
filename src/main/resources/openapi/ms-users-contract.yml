@@ -1,0 +1,289 @@
+openapi: '3.0.1'
+info:
+  contact:
+    name: Jhonatan Arones
+    email: "jhonatan98181@gmail.com"
+  title: "API Usuarios"
+  description: "Api para operar con usuarios del sistema"
+  version: "1.1.1"
+
+
+servers:
+  - url: http://lfocalhost:8080/operations/ms-users
+    description: path base de producción
+
+tags:
+  - name: Usuarios
+    description: Operaciones solo de consulta de usuarios
+
+paths:
+  /usuarios:
+    get:
+      operationId: getAllUsuarios
+      tags:
+        - Usuarios
+      summary: Consultar usuarios
+      description: Trae todos los usuarios disponibles en el sistema
+      security:
+        - BearerAuth: []
+      #      parameters:
+      #        - $ref: "#/components/parameters/token"
+      responses:
+        "200":
+          description: "Se devuleven todos los usuarios"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UsuarioResponseDto"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    post:
+      operationId: createUsusario
+      tags:
+        - Usuarios
+      summary: Creacion de usuario
+      description: Endpoint para crear usuarios
+      requestBody:
+        description: Datos del usuario a crear
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UsuarioRequestDto"
+      responses:
+        "201":
+          description: Creacion de uuario exitoso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsuarioResponseDto"
+        "400":
+          $ref: "#/components/responses/BadRequestValidation"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /usuarios-orq:
+    post:
+      operationId: createUsusarioOrq
+      tags:
+        - Usuarios
+      summary: Creacion de usuario metodo orquestado
+      description: Endpoint para crear usuarios me manera orquestada
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Datos del usuario a crear
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UsuarioRequestDto"
+      responses:
+        "201":
+          description: Creacion de uuario exitoso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsuarioResponseDto"
+        "400":
+          $ref: "#/components/responses/BadRequestValidation"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+
+components:
+  parameters:
+    token:
+      name: token
+      description: Bearer Token
+      in: header
+      schema:
+        type: string
+      required: true
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    UsuarioResponseDto:
+      type: object
+      description: Representacion de usuarios del sistema
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: id del usuario
+          example: 1
+        nombre:
+          type: string
+          description: bre completo del cliente
+          example: Jhonatan
+        usuario:
+          type: string
+          description: nombre usuario identifiacdor en el sistema
+          example: jhae
+        mail:
+          type: string
+          description: correo del ususario
+          example: jhonatan98181@gmaill.com
+        createdAt:
+          type: string
+          format: date-time
+          description: fecha de creacion del usuario
+          example: 2026-11-13T08:55:00-05:00
+        updatedAt:
+          type: string
+          format: date-time
+          description: fecha de actualizcion del usuario
+          example: 2026-11-13T08:55:00-05:00
+        notificado:
+          type: boolean
+          description: Indicador que informa si usuario ya fue notificado al momento de su creacion
+          example: false
+
+    UsuarioRequestDto:
+      type: object
+      description: Datos necesario de un nuevo usuario a crear.
+      required:
+        - nombre
+        - contrasena
+        - usuario
+        - mail
+      properties:
+        nombre:
+          type: string
+          description: nombre completo del cliente
+          example: Jhonatan
+          # x-extra-annotation: '@jakarta.validation.constraints.Size(min = 10, message = "La contraseña debe tener al menos 8 caracteres")'
+          minLength: 3
+          pattern: "^[a-zA-Z\\s]+$"
+            # x-field-extra-annotation: >
+            # @jakarta.validation.constraints.Size(min = 3, message = "El nombre debe tener al menos 3 letras")
+          # @jakarta.validation.constraints.Pattern(regexp = "^[a-zA-Z\\s]+$", message = "El nombre solo debe tener letras y espacios")
+        contrasena:
+          type: string
+          description: contraseña segura del cliente
+          example: SW@#&ds@
+          minLength: 8
+          pattern: "^\\S+$"
+            # x-field-extra-annotation: >
+            # @jakarta.validation.constraints.Size(min = 8, message = "El nombre debe tener al menos 8 caracteres")
+          # @jakarta.validation.constraints.NotBlank( message = "El nombre no puede estar en blanco")
+        usuario:
+          type: string
+          description: el usuario identficado del usuario
+          example: jhae
+          minLength: 3
+          pattern: "^[a-zA-Z0-9]+$"
+            # x-field-extra-annotation: >
+            # @jakarta.validation.constraints.Size(min = 3, message = "El usuario debe tener al menos 3 caracteres")
+          # @jakarta.validation.constraints.Pattern(regexp = "^[a-zA-Z0-9]+$", message = "El usuario puede contener solo letras y numeros")
+        mail:
+          type: string
+          description: "el correo del usuario"
+          example: jhonatan98181@gmaill.com
+          format: email
+            # x-field-extra-annotation: >
+          # @jakarta.validation.constraints.Email( message = "El mail debe ser correo valido")
+
+    Usuario:
+      type: object
+      description: Representacion de usuarios
+      required:
+        - activo
+        - nombre
+      properties:
+        nombre:
+          type: string
+          description: Nombre del usuario
+          example: "Jhonatan Charles"
+          pattern: '^[a-zA-Z\s]+$'
+          minLength: 3
+          maxLength: 50
+        edad:
+          type: integer
+          format: int64
+          description: Edad del usuario
+          example: 20
+        saldo:
+          type: number
+          format: float
+          description: saldo actual que posee el usuario
+          example: 20.4556
+        correo:
+          type: string
+          format: email
+          description: correo del usuario
+          example: jhonatan98181@gmail.com
+        civil:
+          type: string
+          description: Estado civil del usuario
+          enum: [soltero, casado]
+          example: soltero
+        activo:
+          type: boolean
+          description: Indicador si usuario se encuentra habilitado en sistema
+          example: true
+        fecha:
+          type: string
+          format: date-time
+          description: fecha de nacimiento del usuario
+        tarjeta:
+          type: array
+          description: todas las tarjetas del usuarios
+          items:
+            $ref: "#/components/schemas/Tarjeta"
+
+    Tarjeta:
+      type: object
+      description: Represntacion de tarjeta
+      properties:
+        numerocta:
+          type: string
+          minLength: 5
+          pattern: "^[0-9]+$"
+          example: "56546"
+
+    ValidationErrorResponse:
+      type: object
+      description: Mapa de errores de validaciones
+      additionalProperties:
+        type: string
+      example:
+        nombre: El nombre debe tener al menos 3 letras
+        mail: El mail debe ser correo valido
+
+
+  responses:
+    BadRequestValidation:
+      description: Error de validaciones de datos
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ValidationErrorResponse"
+
+    Forbidden:
+      description: No autorizado (Token inválido o ausente)
+
+    Unauthorized:
+      description: "Prohibido (El token no contiene el rol requerido: ADMIN)"
+
+    InternalServerError:
+      description: Error interno no esperado

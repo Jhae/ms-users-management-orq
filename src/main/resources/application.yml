@@ -1,0 +1,100 @@
+mp:
+  #OpenAPi
+  openapi:
+    scan:
+      disable: true
+
+quarkus:
+  # Open APi
+  smallrye-openapi:
+    path: /q/openapi
+
+  # Swagger UI (Obligatorio)
+  swagger-ui:
+    always-include: true
+
+  # OpenAPi Generator Server
+  openapi:
+    generator:
+      server:
+        use: openapitools
+        base-package: org.arones.contract.ms.users.management.orq
+        input-base-dir: src/main/resources/META-INF
+        spec: openapi.yml
+        use-rest-response: true
+        use-bean-validation: true
+
+  # OpenAPi Generator
+  openapi-generator:
+    codegen:
+      input-base-dir: src/main/resources/openapi
+      spec:
+        ms_users_contract_yml:
+          base-package: org.arones.contract.ms.users
+          additional-api-type-annotations: "@io.quarkus.oidc.token.propagation.common.AccessToken"
+#    ms_users_contract_yml:
+#      auth:
+#        BearerAuth:
+#          token-propagation: true
+
+  rest-client:
+#    propagate-headers: Authorization
+    ms_users_contract_yml:
+      url: http://localhost:8080/operations/ms-users
+    logging:
+      scope: request-response
+      body-limit: 1024
+
+  # OpenIDConnect
+  oidc:
+    client-id: theApp
+    auth-server-url: "http://localhost:9090/realms/myrealm"
+    credentials:
+      secret: KZMJqQauhuuEEI5XtKmwiaUVYcWnOcAuC88h8sETWCSS0VsWP10zEjP1v1ALUvpluU6Vfhdd7kYRW5Yj0t0Lgt
+
+  ### TELEMETRIA
+  # Para Tempo Grafana (Helm)
+  otel:
+    service:
+      name: ms-users-management-orq
+    enabled: true
+    exporter:
+      otlp:
+        endpoint: http://localhost:4317
+
+  # Exponer metricas para Prometheus
+  micrometer:
+    export:
+      prometheus:
+        enabled: true
+        path: /q/metrics
+  # Formato de logs
+  log:
+    console:
+      format: "%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c.%M] (%t) [traceId=%X{traceId}, spanId=%X{spanId}] %s%e%n"
+    category:
+      "org.arones":
+        level: DEBUG
+  # CORS
+  http:
+    port: 8083
+    root-path: "/management/ms-users-management-orq"
+    non-application-root-path: "/q"
+    cors:
+      enabled: true
+      origins: "*"
+      methods: GET, POST, PUT, DELETE
+      exposed-headers: Content-Disposition
+      access-control-max-age: 24H
+      access-control-allow-credentials: true
+
+org:
+#  eclipse:
+#    microprofile:
+#      rest:
+#        client:
+#          propagateHeaders: Authorization
+  arones:
+    proxy:
+      NotificationsApi/mp-rest/uri: http://localhost:8082/operations/ms-notifications
+      NotificationsApi/mp-rest/scope: jakarta.inject.Singleton
