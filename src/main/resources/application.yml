@@ -1,5 +1,5 @@
 mp:
-  #OpenAPi
+#OpenAPi
   openapi:
     scan:
       disable: true
@@ -55,9 +55,13 @@ quarkus:
   ### TELEMETRIA
   # Para Tempo Grafana (Helm)
   otel:
+    sdk:
+      disabled: false
     service:
-      name: ms-users-management-orq
+      name: "${quarkus.application.name}-${quarkus.application.version}"
     enabled: true
+    traces:
+#      exporter: "otlp"
     exporter:
       otlp:
         endpoint: http://localhost:4317
@@ -75,11 +79,12 @@ quarkus:
     category:
       "org.arones":
         level: DEBUG
-  # CORS
+
   http:
     port: 8083
     root-path: "/management/ms-users-management-orq"
     non-application-root-path: "/q"
+  # CORS
     cors:
       enabled: true
       origins: "*"
