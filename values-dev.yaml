@@ -1,0 +1,41 @@
+# Default values for milab.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+
+name: "ms-users-management-orq"
+version: 1.0.0
+verFmt: "1-0-0"
+
+# Valores estaticos
+environment: experimental
+namespace: default
+replicas: 1
+image:
+  repository: jharev/ms-users-management-orq
+  tag: latest
+
+keyVault:
+  enabled: false
+
+# Valores para inyectar en ms
+properties:
+
+  # Keycloak
+  QUARKUS_OIDC_AUTH_SERVER_URL: "http://host.docker.internal:9090/realms/myrealm"
+  # Kafka
+  KAFKA_BOOTSTRAP_SERVERS: kafka-svc:9092
+  # Schema Registry Avro
+  MP_MESSAGING_CONNECTOR_SMALLRYE_KAFKA_SCHEMA_REGISTRY_URL: "http://schema-registry-svc:8081"
+  # Telemetria
+  QUARKUS_OTEL_SDK_DISABLED: "false"
+  QUARKUS_OTEL_EXPORTER_OTLP_ENDPOINT: "http://tempo.monitoring.svc.cluster.local:4317"
+
+  # Puerto
+  QUARKUS_HTTP_PORT: 8080
+
+  # Clientes Rest
+  QUARKUS_REST_CLIENT_MS_USERS_CONTRACT_YML_URL: "http://ms-users-1-0-0-svc:8080/operations/ms-users"
+  ORG_ARONES_PROXY_NOTIFICATIONSAPI_MP_REST_URI: "http://ms-notifications-1-0-0-svc:8080/operations/ms-notifications"
+
