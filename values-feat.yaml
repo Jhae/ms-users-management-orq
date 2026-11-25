@@ -9,21 +9,21 @@ version: 1.0.0
 verFmt: "1-0-0"
 
 # Valores estaticos
-environment: certificacion
+environment: experimental
 namespace: default
 replicas: 1
 image:
-  repository: jharev/ms-notifications
+  repository: jharev/ms-users-management-orq
   tag: latest
 
 keyVault:
-  enabled: true
+  enabled: false
 
 # Valores para inyectar en ms
 properties:
 
   # Keycloak
-  QUARKUS_OIDC_AUTH_SERVER_URL: "https://kilometer-childless-absinthe.ngrok-free.dev/realms/myrealm"
+  QUARKUS_OIDC_AUTH_SERVER_URL: "http://host.docker.internal:9090/realms/myrealm"
   # Kafka
   KAFKA_BOOTSTRAP_SERVERS: kafka-svc:9092
   # Schema Registry Avro
